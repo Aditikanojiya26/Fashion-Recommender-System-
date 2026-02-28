@@ -1,0 +1,16 @@
+# Ignore VS Code settings
+.vscode/
+
+# Ignore development files
+main.py
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore local upload folder (optional)
+uploads/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
