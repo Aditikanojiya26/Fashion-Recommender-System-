@@ -32,11 +32,13 @@ def save_uploaded_file(uploaded_file):
     except:
         return 0
 
-def feature_extraction(img_path, model):
-    img = image.load_img(img_path, target_size=(224, 224))
+def feature_extraction(img, model):
+    # Resize image to 224x224
+    img = img.resize((224, 224))
     img_array = image.img_to_array(img)
-    expanded_img = tf.expand_dims(img_array, axis=0)
+    expanded_img = np.expand_dims(img_array, axis=0)
     preprocessed_img = preprocess_input(expanded_img)
+    
     result = model.predict(preprocessed_img).flatten()
     normalized_result = result / norm(result)
     return normalized_result
@@ -50,29 +52,19 @@ def recommend(features, feature_list):
 
 uploaded_file = st.file_uploader("Upload an image of clothing item", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
-    if save_uploaded_file(uploaded_file):
-        st.image(Image.open(uploaded_file))
-        features = feature_extraction(os.path.join("uploads", uploaded_file.name), model)
+   
+    display_image = Image.open(uploaded_file).convert('RGB')
+    st.image(display_image, caption="Uploaded Image", use_container_width=True)
+    
+    
+    with st.spinner('Extracting features...'):
+        features = feature_extraction(display_image, model)
         indices = recommend(features, feature_list)
 
-        col1, col2, col3, col4, col5 = st.columns(5)
-        print(filenames[indices[0][0]])  # Debugging line to check the indices of recommended items
-        with col1:
-          st.image(filenames[indices[0][0]], width=150)
-
-        with col2:
-            st.image(filenames[indices[0][1]], width=150)
-
-        with col3:
-            st.image(filenames[indices[0][2]], width=150)
-
-        with col4:
-            st.image(filenames[indices[0][3]], width=150)
-
-        with col5:
-            st.image(filenames[indices[0][4]], width=150)
-
-
-    else:
-        st.error("Error uploading file")
     
+    st.subheader("Recommended for you:")
+    cols = st.columns(5)
+    for i in range(5):
+        with cols[i]:
+            # Ensure filenames[indices[0][i]] points to a valid path in your GitHub repo
+            st.image(filenames[indices[0][i]], use_container_width=True)
