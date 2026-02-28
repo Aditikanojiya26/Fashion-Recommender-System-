@@ -2,7 +2,7 @@
 .vscode/
 
 # Ignore development files
-main.py
+app.py
 
 # Ignore Python cache
 __pycache__/
